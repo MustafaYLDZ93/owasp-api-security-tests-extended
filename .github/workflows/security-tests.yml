@@ -49,7 +49,10 @@ jobs:
         run: npx playwright install --with-deps chromium
 
       - name: Run security tests (Secure API)
-        run: npx playwright test --reporter=list,html
+        # NOT: --reporter burada KASITLI olarak verilmiyor — CLI'dan geçilen
+        # --reporter, playwright.config.ts'teki reporter ayarını (ve özellikle
+        # html raporunun outputFolder'ını) tamamen ezer.
+        run: npx playwright test
         env:
           CI: true
 
@@ -84,7 +87,8 @@ jobs:
 
       - name: Run security tests (Vulnerable API)
         # FAIL'ler beklenen sonuçtur — exit code yok sayılır ki job abort olmasın.
-        run: npx playwright test --config=playwright.config.vulnerable.ts --reporter=list,html || true
+        # --reporter burada da KASITLI olarak verilmiyor — bkz. secure job'daki not.
+        run: npx playwright test --config=playwright.config.vulnerable.ts || true
         env:
           CI: true
 

@@ -3,6 +3,9 @@
   "version": "1.0.0",
   "description": "OWASP API Security Top 10 (2023) + genişletilmiş CWE/WSTG kapsamlı Playwright güvenlik test süiti (gerçek SQLi/XXE/GraphQL/OAuth/CSRF sink'leriyle)",
   "private": true,
+  "engines": {
+    "node": ">=22"
+  },
   "scripts": {
     "test": "playwright test",
     "test:vulnerable": "playwright test --config=playwright.config.vulnerable.ts",
@@ -24,7 +27,6 @@
     "express-rate-limit": "^8.7.4",
     "express-session": "^1.19.0",
     "graphql": "^17.1.0",
-    "graphql-http": "^1.23.1",
     "jsonwebtoken": "^9.0.3",
     "jszip": "^3.10.2",
     "multer": "^2.5.0"

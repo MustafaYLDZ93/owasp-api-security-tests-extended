@@ -22,7 +22,9 @@ on:
   pull_request:
 
 env:
-  NODE_VERSION: '20'
+  # better-sqlite3@13 ve graphql@17 Node >=22 gerektirir (engines alanı) —
+  # Node 20 ile sunucu hiç çıktı vermeden çöküyor ve health-check timeout'a düşüyor.
+  NODE_VERSION: '22'
 
 jobs:
   test-secure:

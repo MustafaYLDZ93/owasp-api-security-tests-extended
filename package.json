@@ -1,0 +1,37 @@
+{
+  "name": "owasp-api-security-tests-extended",
+  "version": "1.0.0",
+  "description": "OWASP API Security Top 10 (2023) + genişletilmiş CWE/WSTG kapsamlı Playwright güvenlik test süiti (gerçek SQLi/XXE/GraphQL/OAuth/CSRF sink'leriyle)",
+  "private": true,
+  "scripts": {
+    "test": "playwright test",
+    "test:vulnerable": "playwright test --config=playwright.config.vulnerable.ts",
+    "test:injection": "playwright test injection.security.spec.ts",
+    "test:auth": "playwright test auth-session.security.spec.ts",
+    "test:authz": "playwright test authorization.security.spec.ts",
+    "test:business": "playwright test business-logic.security.spec.ts",
+    "test:ssrf": "playwright test ssrf-resource.security.spec.ts",
+    "test:misconfig": "playwright test misconfig-inventory.security.spec.ts",
+    "test:clientside": "playwright test client-side.security.spec.ts --project=chromium",
+    "report": "playwright show-report",
+    "start:api": "node api-server/server.js",
+    "start:api:vulnerable": "node api-server/server-vulnerable.js"
+  },
+  "dependencies": {
+    "better-sqlite3": "^13.2.0",
+    "cookie-parser": "^1.4.7",
+    "express": "^5.3.0",
+    "express-rate-limit": "^8.7.4",
+    "express-session": "^1.19.0",
+    "graphql": "^17.1.0",
+    "graphql-http": "^1.23.1",
+    "jsonwebtoken": "^9.0.3",
+    "jszip": "^3.10.2",
+    "multer": "^2.5.0"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.65.1",
+    "@types/node": "^26.6.6",
+    "typescript": "^7.0.2"
+  }
+}

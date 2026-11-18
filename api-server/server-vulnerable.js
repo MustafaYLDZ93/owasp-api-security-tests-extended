@@ -39,9 +39,13 @@ const JWT_SECRET = 'weak-secret-123';
 
 const db = createDb(path.join(__dirname, 'db', `data-${PORT}.sqlite`));
 
-// VULNERABILITY: no body size limit (TC-CONS-01 analogue FAILS).
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+// VULNERABILITY: no meaningful body size limit (TC-CONS-01 analogue FAILS).
+// NOT: express.json()'ın kendi dahili varsayılanı zaten ~100kb'dir — bunu
+// gerçekten "sınırsız" göstermek için yüksek bir limit açıkça belirtilir,
+// yoksa Express'in kendi varsayılanı yanlışlıkla bir "güvenlik kontrolü"
+// gibi görünüp testi anlamsızlaştırır.
+app.use(express.json({ limit: '50mb' }));
+app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 app.use(cookieParser());
 app.use(session({
   secret: 'weak-session-secret',

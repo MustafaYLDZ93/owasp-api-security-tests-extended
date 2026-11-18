@@ -1,0 +1,20 @@
+<!doctype html>
+<html lang="tr">
+<head><meta charset="utf-8"><title>Panel</title></head>
+<body>
+  <div id="admin-panel" style="display:none">GİZLİ ADMIN PANELİ</div>
+  <div id="status">yükleniyor...</div>
+  <script>
+    // VULNERABILITY: yetki kararı tamamen istemci tarafında, localStorage'daki
+    // bir bayrağa göre veriliyor — DevTools Console'dan localStorage.setItem
+    // ile trivially sahteleştirilebilir (CWE-602).
+    (function () {
+      const role = localStorage.getItem('role');
+      if (role === 'admin') {
+        document.getElementById('admin-panel').style.display = 'block';
+      }
+      document.getElementById('status').textContent = 'rol: ' + (role ?? 'yok');
+    })();
+  </script>
+</body>
+</html>

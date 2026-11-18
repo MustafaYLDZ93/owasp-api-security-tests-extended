@@ -47,15 +47,16 @@ export default defineConfig({
     {
       // Client-side/DevTools family needs a real DOM (XSS rendering, clickjacking,
       // postMessage, localStorage, CORS from a page, reverse tabnabbing, etc.).
-      // Uses the pre-installed Chromium in this container instead of downloading one.
+      // PW_CHROMIUM_PATH lets a sandboxed dev container point at its own
+      // pre-installed Chromium; CI (GitHub Actions) runs `playwright install`
+      // and uses Playwright's own managed browser (no override needed).
       name: 'chromium',
       testMatch: ['client-side.security.spec.ts'],
       use: {
         ...devices['Desktop Chrome'],
-        launchOptions: {
-          executablePath: process.env.PW_CHROMIUM_PATH || '/opt/pw-browsers/chromium',
-          args: ['--no-sandbox'],
-        },
+        launchOptions: process.env.PW_CHROMIUM_PATH
+          ? { executablePath: process.env.PW_CHROMIUM_PATH, args: ['--no-sandbox'] }
+          : { args: ['--no-sandbox'] },
       },
     },
   ],

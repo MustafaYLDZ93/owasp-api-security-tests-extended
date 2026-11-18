@@ -1,0 +1,17 @@
+<!doctype html>
+<html lang="tr">
+<head><meta charset="utf-8"><title>Profil</title></head>
+<body>
+  <h1>Profil</h1>
+  <div id="greeting"></div>
+  <script>
+    // VULNERABILITY: innerHTML ile ham HTML enjeksiyonu (CWE-79, DOM XSS).
+    (function () {
+      const hash = location.hash.slice(1);
+      const params = new URLSearchParams(hash);
+      const name = params.get('name') ?? '';
+      document.getElementById('greeting').innerHTML = 'Merhaba, ' + name;
+    })();
+  </script>
+</body>
+</html>

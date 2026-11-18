@@ -1,0 +1,18 @@
+<!doctype html>
+<html lang="tr">
+<head><meta charset="utf-8"><title>Profil</title></head>
+<body>
+  <h1>Profil</h1>
+  <div id="greeting"></div>
+  <script>
+    // CWE-79 DOM XSS — URL fragment DOM'a render edilir.
+    // GÜVENLİ: textContent kullanılır, HTML asla yorumlanmaz.
+    (function () {
+      const hash = location.hash.slice(1);
+      const params = new URLSearchParams(hash);
+      const name = params.get('name') ?? '';
+      document.getElementById('greeting').textContent = 'Merhaba, ' + name;
+    })();
+  </script>
+</body>
+</html>

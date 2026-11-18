@@ -44,10 +44,9 @@ export default defineConfig({
       testMatch: ['client-side.security.spec.ts'],
       use: {
         ...devices['Desktop Chrome'],
-        launchOptions: {
-          executablePath: process.env.PW_CHROMIUM_PATH || '/opt/pw-browsers/chromium',
-          args: ['--no-sandbox'],
-        },
+        launchOptions: process.env.PW_CHROMIUM_PATH
+          ? { executablePath: process.env.PW_CHROMIUM_PATH, args: ['--no-sandbox'] }
+          : { args: ['--no-sandbox'] },
       },
     },
   ],

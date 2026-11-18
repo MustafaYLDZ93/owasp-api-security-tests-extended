@@ -1,0 +1,16 @@
+<!doctype html>
+<html lang="tr">
+<head><meta charset="utf-8"><title>Bildirim</title></head>
+<body>
+  <div id="notice">bekleniyor</div>
+  <script>
+    // VULNERABILITY: gönderenin origin'i hiç kontrol edilmiyor — herhangi bir
+    // sayfa (iframe/popup) bu pencereye mesaj enjekte edebilir (CWE-346).
+    window.addEventListener('message', function (event) {
+      window.__lastMessageAccepted = true;
+      document.getElementById('notice').textContent = String(event.data);
+      document.title = String(event.data);
+    });
+  </script>
+</body>
+</html>

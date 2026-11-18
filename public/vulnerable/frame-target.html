@@ -1,0 +1,9 @@
+<!doctype html>
+<html lang="tr">
+<head><meta charset="utf-8"><title>Hassas İşlem</title></head>
+<body>
+  <!-- VULNERABILITY: server-vulnerable.js hiçbir X-Frame-Options/CSP göndermez
+       → bu sayfa görünmez bir iframe içine gömülerek clickjacking yapılabilir. -->
+  <button id="delete-account-btn">Hesabı Sil</button>
+</body>
+</html>

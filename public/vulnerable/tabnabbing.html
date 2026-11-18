@@ -1,0 +1,9 @@
+<!doctype html>
+<html lang="tr">
+<head><meta charset="utf-8"><title>Dış Bağlantı</title></head>
+<body>
+  <!-- VULNERABILITY: rel="noopener" eksik — açılan sekme window.opener
+       üzerinden bu sayfayı (örn. location.href ile phishing'e) yönlendirebilir. -->
+  <a id="ext-link" href="https://example.com" target="_blank">Dış bağlantı</a>
+</body>
+</html>

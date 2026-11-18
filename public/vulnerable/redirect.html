@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="tr">
+<head><meta charset="utf-8"><title>Yönlendirme</title></head>
+<body>
+  <p id="status">bekleniyor...</p>
+  <script>
+    // VULNERABILITY: hedef URL hiç doğrulanmadan location.href'e atanır.
+    window.evaluateRedirect = function (to) {
+      try {
+        const target = new URL(to, location.href);
+        return { allowed: true, target: target.href }; // BUG: her zaman izinli
+      } catch {
+        return { allowed: false, target: null };
+      }
+    };
+
+    (function () {
+      const params = new URLSearchParams(location.search);
+      const to = params.get('to');
+      if (!to) { document.getElementById('status').textContent = 'hedef yok'; return; }
+      const decision = window.evaluateRedirect(to);
+      document.getElementById('status').textContent = 'yönlendiriliyor: ' + decision.target;
+      if (decision.allowed) location.href = decision.target;
+    })();
+  </script>
+</body>
+</html>

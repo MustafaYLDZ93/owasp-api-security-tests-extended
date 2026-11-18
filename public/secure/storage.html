@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="tr">
+<head><meta charset="utf-8"><title>Panel</title></head>
+<body>
+  <div id="admin-panel" style="display:none">GİZLİ ADMIN PANELİ</div>
+  <div id="status">yükleniyor...</div>
+  <script>
+    // CWE-602/565 Client-Side Enforcement of Server-Side Security.
+    // GÜVENLİ: yetki localStorage'daki bir bayraktan değil, sunucudan
+    // (gerçek bir JWT ile /api/users/me) doğrulanır.
+    (async function () {
+      const token = localStorage.getItem('token');
+      if (!token) { document.getElementById('status').textContent = 'giriş yapılmadı'; return; }
+      try {
+        const res = await fetch('/api/users/me', { headers: { Authorization: 'Bearer ' + token } });
+        if (!res.ok) { document.getElementById('status').textContent = 'yetkisiz'; return; }
+        const me = await res.json();
+        if (me.role === 'admin') {
+          document.getElementById('admin-panel').style.display = 'block';
+        }
+        document.getElementById('status').textContent = 'rol: ' + me.role;
+      } catch {
+        document.getElementById('status').textContent = 'hata';
+      }
+    })();
+  </script>
+</body>
+</html>

@@ -283,7 +283,7 @@ app.post('/api/orders', requireAuth, (req, res) => {
     db.prepare('INSERT INTO orders (id, user_id, product_id, quantity, status, created_at) VALUES (?,?,?,?,?,?)')
       .run(id, req.user.id, productId, quantity ?? 1, 'created', new Date().toISOString());
     res.status(201).json({ id, userId: req.user.id, productId, quantity, status: 'created' });
-  }, 5);
+  }, 25); // geniş bir pencere: yoğun eşzamanlı test yükünde bile yarışı güvenilir şekilde ortaya çıkarır
 });
 
 app.post('/api/orders/:id/reserve', requireAuth, (req, res) => {
@@ -335,7 +335,7 @@ app.post('/api/coupons/:code/redeem', requireAuth, (req, res) => {
     db.prepare('INSERT INTO coupon_redemptions (code, user_id, created_at) VALUES (?,?,?)')
       .run(req.params.code, req.user.id, new Date().toISOString());
     res.json({ code: req.params.code, discountPercent: coupon.discount_percent });
-  }, 5);
+  }, 25);
 });
 
 // ═══════════════════════════════════════════════════════════════════════

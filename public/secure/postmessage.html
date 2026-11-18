@@ -1,0 +1,20 @@
+<!doctype html>
+<html lang="tr">
+<head><meta charset="utf-8"><title>Bildirim</title></head>
+<body>
+  <div id="notice">bekleniyor</div>
+  <script>
+    // CWE-346 Origin Validation Error.
+    // GÜVENLİ: yalnızca kendi origin'imizden gelen mesajlar işlenir.
+    window.addEventListener('message', function (event) {
+      if (event.origin !== window.location.origin) {
+        window.__lastMessageAccepted = false;
+        return; // yabancı origin → yok say
+      }
+      window.__lastMessageAccepted = true;
+      document.getElementById('notice').textContent = String(event.data);
+      document.title = String(event.data);
+    });
+  </script>
+</body>
+</html>

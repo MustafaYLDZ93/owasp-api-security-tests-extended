@@ -4,5 +4,8 @@ test-results*/
 api-server/uploads/*
 !api-server/uploads/.gitkeep
 api-server/db/*.sqlite
+api-server/db/*.sqlite-shm
+api-server/db/*.sqlite-wal
 *.log
+.api-server-*.pid
 

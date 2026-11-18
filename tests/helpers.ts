@@ -33,3 +33,21 @@ export async function sessionLogin(
 export function sleep(ms: number): Promise<void> {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
+
+/**
+ * Extracts a single cookie's raw value from a `fetch` Response's Set-Cookie
+ * header(s). The session-fixation/logout-invalidation tests use the global
+ * `fetch` (not the Playwright `request` fixture's own cookie jar) so they
+ * have full, unambiguous manual control over exactly which cookie value is
+ * replayed on each call.
+ */
+export function extractCookieValue(res: Response, cookieName: string): string | null {
+  const setCookies = typeof (res.headers as any).getSetCookie === 'function'
+    ? (res.headers as any).getSetCookie()
+    : [res.headers.get('set-cookie') ?? ''];
+  for (const raw of setCookies) {
+    const match = new RegExp(`^${cookieName}=([^;]*)`).exec(raw);
+    if (match) return match[1];
+  }
+  return null;
+}

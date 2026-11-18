@@ -239,6 +239,23 @@ app.post('/api/users/me/security-question', requireAuth, (req, res) => {
   res.json({ ok: true });
 });
 
+// CWE-307/640 — guessing the (often weak/predictable) security-question
+// answer is itself rate-limited, same as password brute force (TC-S09).
+const securityAnswerAttempts = new SlidingWindowCounter(15_000);
+app.post('/api/auth/security-answer/attempt', (req, res) => {
+  const { email, answer } = req.body ?? {};
+  if (securityAnswerAttempts.get(email) >= 5) {
+    return res.status(429).json({ error: 'Too many attempts. Try again later.' });
+  }
+  const user = db.prepare('SELECT * FROM users WHERE email = ?').get(email);
+  if (user && user.security_answer === answer) {
+    securityAnswerAttempts.reset(email);
+    return res.json({ ok: true, recoveryToken: crypto.randomBytes(16).toString('hex') });
+  }
+  securityAnswerAttempts.increment(email);
+  res.status(401).json({ ok: false });
+});
+
 app.get('/api/users', requireAuth, (req, res) => {
   const limit = Math.min(parseInt(req.query.limit, 10) || 20, 100);
   const page = Math.max(parseInt(req.query.page, 10) || 1, 1);
@@ -628,6 +645,13 @@ app.post('/oauth/token', (req, res) => {
 // ═══════════════════════════════════════════════════════════════════════
 // Cookie/session family (CSRF, session fixation/hijacking — CWE-352,384,613,1275)
 // ═══════════════════════════════════════════════════════════════════════
+
+// Harmless pre-auth endpoint that forces a session cookie to be issued so
+// tests can capture a "before login" session ID for the fixation test (TC-S14).
+app.get('/api/session/touch', (req, res) => {
+  req.session.touchedAt = Date.now();
+  res.json({ ok: true });
+});
 
 app.post('/api/session/login', (req, res) => {
   const { email, password } = req.body ?? {};

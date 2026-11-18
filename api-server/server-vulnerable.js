@@ -197,6 +197,17 @@ app.post('/api/users/me/security-question', requireAuth, (req, res) => {
   res.json({ ok: true });
 });
 
+// VULNERABILITY: no rate limit on security-answer guessing — combined with
+// the predictable seed answers ("blue"/"green"/"red") this is brute-forceable (CWE-307/640).
+app.post('/api/auth/security-answer/attempt', (req, res) => {
+  const { email, answer } = req.body ?? {};
+  const user = db.prepare('SELECT * FROM users WHERE email = ?').get(email);
+  if (user && user.security_answer === answer) {
+    return res.json({ ok: true, recoveryToken: crypto.randomBytes(16).toString('hex') });
+  }
+  res.status(401).json({ ok: false });
+});
+
 // VULNERABILITY: no max page-size cap (CWE-770).
 app.get('/api/users', requireAuth, (req, res) => {
   const limit = parseInt(req.query.limit, 10) || 20;
@@ -527,6 +538,11 @@ app.post('/oauth/token', (req, res) => {
 // ═══════════════════════════════════════════════════════════════════════
 // Cookie/session family
 // ═══════════════════════════════════════════════════════════════════════
+
+app.get('/api/session/touch', (req, res) => {
+  req.session.touchedAt = Date.now();
+  res.json({ ok: true });
+});
 
 app.post('/api/session/login', (req, res) => {
   const { email, password } = req.body ?? {};

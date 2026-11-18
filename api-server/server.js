@@ -24,7 +24,7 @@ const multer = require('multer');
 const JSZip = require('jszip');
 
 const { createDb } = require('./db/init');
-const { verifyPassword } = require('./lib/hash');
+const { verifyPassword, hashPassword } = require('./lib/hash');
 const { matchesSecure } = require('./lib/nosql-match');
 const { echoSecure } = require('./lib/system-exec');
 const { renderSecure } = require('./lib/template-engine');
@@ -184,6 +184,29 @@ app.post('/api/auth/login-legacy', (req, res) => {
   const match = snapshot.find(u => matchesSecure(u, { email, _passwordProbe: password }) && verifyPassword(password ?? '', u.password_hash));
   if (!match) return res.status(401).json({ error: 'Invalid credentials' });
   res.json({ token: issueJwt(match) });
+});
+
+// Registration — also used by tests to create disposable users for
+// destructive BOLA checks without touching the shared seed accounts.
+// CWE-521: minimum password strength is enforced (TC-S08).
+function isStrongPassword(pw) {
+  return typeof pw === 'string' && pw.length >= 8 && /[a-zA-Z]/.test(pw) && /[0-9]/.test(pw);
+}
+app.post('/api/auth/register', (req, res) => {
+  const { email, password, name } = req.body ?? {};
+  if (!email || !name) return res.status(400).json({ error: 'email and name required' });
+  if (db.prepare('SELECT id FROM users WHERE email = ?').get(email)) {
+    return res.status(409).json({ error: 'Email already registered' });
+  }
+  if (!isStrongPassword(password)) {
+    return res.status(400).json({ error: 'Password must be at least 8 characters and include a letter and a number' });
+  }
+  const id = db.prepare('SELECT COALESCE(MAX(id), 0) + 1 AS nextId FROM users').get().nextId;
+  db.prepare(`
+    INSERT INTO users (id, email, password_hash, name, role, credits, verified, referral_code)
+    VALUES (?, ?, ?, ?, 'user', 0, 0, ?)
+  `).run(id, email, hashPassword(password), name, `REF_${id}_${crypto.randomBytes(3).toString('hex')}`);
+  res.status(201).json({ id, email, token: issueJwt({ id, email, role: 'user' }) });
 });
 
 app.get('/api/users/me', meLimiter, requireAuth, (req, res) => {
@@ -529,12 +552,12 @@ app.post('/api/notifications/sms', requireAuth, (req, res) => {
 // Generic file upload → DB-tracked, BOLA-protected download.
 app.post('/api/files/upload', requireAuth, upload.single('file'), (req, res) => {
   if (!req.file) return res.status(400).json({ error: 'file required' });
-  const id = crypto.randomUUID();
-  const storedPath = path.join(__dirname, 'uploads', `${PORT}-${id}`);
+  const diskName = crypto.randomUUID(); // only used to avoid on-disk filename collisions
+  const storedPath = path.join(__dirname, 'uploads', `${PORT}-${diskName}`);
   fs.writeFileSync(storedPath, req.file.buffer);
-  db.prepare('INSERT INTO files (owner_id, filename, stored_path, uploaded_at) VALUES (?,?,?,?)')
+  const info = db.prepare('INSERT INTO files (owner_id, filename, stored_path, uploaded_at) VALUES (?,?,?,?)')
     .run(req.user.id, req.file.originalname, storedPath, new Date().toISOString());
-  res.status(201).json({ id, filename: req.file.originalname });
+  res.status(201).json({ id: info.lastInsertRowid, filename: req.file.originalname });
 });
 
 app.get('/api/files/:id/download', requireAuth, (req, res) => {

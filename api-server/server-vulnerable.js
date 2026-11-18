@@ -21,7 +21,7 @@ const multer = require('multer');
 const JSZip = require('jszip');
 
 const { createDb } = require('./db/init');
-const { verifyPassword } = require('./lib/hash');
+const { verifyPassword, hashPassword } = require('./lib/hash');
 const { matchesVulnerable } = require('./lib/nosql-match');
 const { echoVulnerable } = require('./lib/system-exec');
 const { renderVulnerable } = require('./lib/template-engine');
@@ -146,6 +146,21 @@ app.post('/api/auth/login-legacy', (req, res) => {
   if (!match) return res.status(401).json({ error: 'Invalid credentials' });
   // BUG: password is not actually re-verified once the (possibly operator-injected) email filter matches.
   res.json({ token: issueJwt(match) });
+});
+
+// VULNERABILITY: no password strength requirement at all (CWE-521, TC-S08).
+app.post('/api/auth/register', (req, res) => {
+  const { email, password, name } = req.body ?? {};
+  if (!email || !name) return res.status(400).json({ error: 'email and name required' });
+  if (db.prepare('SELECT id FROM users WHERE email = ?').get(email)) {
+    return res.status(409).json({ error: 'Email already registered' });
+  }
+  const id = db.prepare('SELECT COALESCE(MAX(id), 0) + 1 AS nextId FROM users').get().nextId;
+  db.prepare(`
+    INSERT INTO users (id, email, password_hash, name, role, credits, verified, referral_code)
+    VALUES (?, ?, ?, ?, 'user', 0, 0, ?)
+  `).run(id, email, hashPassword(password ?? ''), name, `REF_${id}_${crypto.randomBytes(3).toString('hex')}`);
+  res.status(201).json({ id, email, token: issueJwt({ id, email, role: 'user' }) });
 });
 
 // VULNERABILITY: returns the FULL row including password_hash/security_answer (CWE-200, BOPLA).
@@ -435,12 +450,12 @@ app.post('/api/notifications/sms', requireAuth, (req, res) => {
 
 app.post('/api/files/upload', requireAuth, upload.single('file'), (req, res) => {
   if (!req.file) return res.status(400).json({ error: 'file required' });
-  const id = crypto.randomUUID();
-  const storedPath = path.join(__dirname, 'uploads', `${PORT}-${id}`);
+  const diskName = crypto.randomUUID();
+  const storedPath = path.join(__dirname, 'uploads', `${PORT}-${diskName}`);
   fs.writeFileSync(storedPath, req.file.buffer);
-  db.prepare('INSERT INTO files (owner_id, filename, stored_path, uploaded_at) VALUES (?,?,?,?)')
+  const info = db.prepare('INSERT INTO files (owner_id, filename, stored_path, uploaded_at) VALUES (?,?,?,?)')
     .run(req.user.id, req.file.originalname, storedPath, new Date().toISOString());
-  res.status(201).json({ id, filename: req.file.originalname });
+  res.status(201).json({ id: info.lastInsertRowid, filename: req.file.originalname });
 });
 
 // VULNERABILITY: no ownership check — any authenticated user can download any file (BOLA on files).

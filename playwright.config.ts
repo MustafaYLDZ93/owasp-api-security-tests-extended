@@ -31,7 +31,11 @@ export default defineConfig({
 
   use: {
     baseURL: process.env.API_BASE_URL,
-    extraHTTPHeaders: { 'Content-Type': 'application/json' },
+    // NOT: burada sabit bir `Content-Type: application/json` extraHTTPHeaders
+    // KASITLI OLARAK yok — Playwright zaten `data:` ile gönderilen plain
+    // objeler için bu header'ı otomatik ekler; global olarak zorlamak
+    // multipart/form-data (dosya yükleme) isteklerinin Content-Type'ını da
+    // ezer ve body-parser'ın multipart gövdeyi JSON sanıp patlamasına yol açar.
   },
 
   projects: [

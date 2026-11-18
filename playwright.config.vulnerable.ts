@@ -31,7 +31,7 @@ export default defineConfig({
 
   use: {
     baseURL: process.env.API_BASE_URL,
-    extraHTTPHeaders: { 'Content-Type': 'application/json' },
+    // bkz. playwright.config.ts'teki not: global Content-Type zorlaması yok.
   },
 
   projects: [

@@ -41,6 +41,25 @@ export function sleep(ms: number): Promise<void> {
  * have full, unambiguous manual control over exactly which cookie value is
  * replayed on each call.
  */
+let disposableCounter = 0;
+
+/**
+ * Registers a throwaway user and returns its auth header. Destructive BOLA
+ * tests (delete another user's account, etc.) use these instead of the
+ * fixed seed accounts so they never corrupt state that other tests depend on.
+ */
+export async function registerDisposableUser(
+  request: APIRequestContext,
+): Promise<{ id: number; email: string; headers: { Authorization: string } }> {
+  disposableCounter += 1;
+  const email = `disposable-${Date.now()}-${disposableCounter}@test.com`;
+  const res = await request.post('/api/auth/register', {
+    data: { email, password: 'Disposable123!', name: `Disposable ${disposableCounter}` },
+  });
+  const body = await res.json();
+  return { id: body.id, email, headers: { Authorization: `Bearer ${body.token}` } };
+}
+
 export function extractCookieValue(res: Response, cookieName: string): string | null {
   const setCookies = typeof (res.headers as any).getSetCookie === 'function'
     ? (res.headers as any).getSetCookie()

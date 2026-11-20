@@ -89,6 +89,8 @@ const meLimiter = rateLimit({
 });
 
 const failedLogins = new SlidingWindowCounter(15_000);
+// CWE-307 — IP-bazlı deneme sayacı (password-spray/credential-stuffing, TC-B15).
+const failedLoginsByIp = new SlidingWindowCounter(15_000);
 const graphqlOps = new SlidingWindowCounter(10_000);
 const smsBudget = new SlidingWindowCounter(60_000);
 
@@ -163,15 +165,24 @@ app.post('/api/auth/login', (req, res) => {
   const { email, password } = req.body ?? {};
   const user = db.prepare('SELECT * FROM users WHERE email = ?').get(email);
 
+  // Doğru kimlik bilgisiyle gelen istek, bu IP'nin geçmişteki başarısız
+  // denemelerinden bağımsız olarak HER ZAMAN kabul edilir — IP-bazlı sayaç
+  // meşru kullanıcıları (aynı NAT/ofis IP'sini paylaşan vb.) asla engellemez,
+  // yalnızca bir sonraki YANLIŞ denemeyi daha hızlı reddeder.
   if (user && verifyPassword(password ?? '', user.password_hash)) {
     failedLogins.reset(email);
     return res.json({ token: issueJwt(user) });
   }
 
-  if (failedLogins.get(email) >= 5) {
+  // Hesap bazlı kilit: tek bir hesaba karşı art arda yanlış şifre.
+  // IP bazlı kilit: aynı IP'den FARKLI hesaplara karşı toplam yanlış deneme
+  // (password-spray/credential-stuffing, TC-B15) — vulnerable sunucuda bu
+  // ikinci sayaç KASITLI olarak yoktur.
+  if (failedLogins.get(email) >= 5 || failedLoginsByIp.get(req.ip) >= 8) {
     return res.status(429).json({ error: 'Too many failed attempts. Try again later.' });
   }
   failedLogins.increment(email);
+  failedLoginsByIp.increment(req.ip);
   res.status(401).json({ error: 'Invalid credentials' });
 });
 

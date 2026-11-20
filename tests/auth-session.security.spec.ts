@@ -30,6 +30,25 @@ test.describe('Auth — Brute-force / Kilitleme (CWE-307, TC-S03)', () => {
   });
 });
 
+test.describe('Auth — IP-bazlı password-spray koruması (CWE-307, TC-B15)', () => {
+  test('aynı IP\'den farklı hesaplara yapılan toplu deneme kilitlenmeli', async ({ request }) => {
+    // Üstteki test tek bir HESABI 6 kez yanlış şifreyle deniyor (hesap bazlı kilit).
+    // Burada ise her denemede FARKLI/önceden hiç kullanılmamış bir e-posta kullanılıyor —
+    // hesap bazlı kilit asla devreye girmez, ama hepsi aynı istemciden (aynı IP) geldiği
+    // için IP-bazlı sayaç bunu bir password-spray/credential-stuffing saldırısı olarak
+    // tanıyıp engellemeli. Vulnerable sunucu IP'yi hiç izlemediğinden bu test orada
+    // her zaman 401 ile kalır ve hiçbir zaman 429'a ulaşmaz (beklenen FAIL).
+    let lastStatus = 0;
+    for (let i = 0; i < 12; i++) {
+      const email = `spray-probe-${i}-${Date.now()}@test.com`;
+      // eslint-disable-next-line no-await-in-loop
+      const res = await request.post('/api/auth/login', { data: { email, password: 'wrong-password' } });
+      lastStatus = res.status();
+    }
+    expect(lastStatus).toBe(429);
+  });
+});
+
 test.describe('Auth — Güvenlik sorusu cevabı tahmini (CWE-307/640, TC-S09)', () => {
   test('zayıf güvenlik sorusu cevabı sınırsız denenememeli', async ({ request }) => {
     let lastStatus = 0;

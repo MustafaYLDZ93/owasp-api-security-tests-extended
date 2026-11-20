@@ -1,9 +1,36 @@
 <!doctype html>
 <html lang="tr">
-<head><meta charset="utf-8"><title>Hassas İşlem</title></head>
+<head>
+  <meta charset="utf-8">
+  <title>Hassas İşlem</title>
+  <link rel="stylesheet" href="/style.css">
+</head>
 <body>
-  <!-- VULNERABILITY: server-vulnerable.js hiçbir X-Frame-Options/CSP göndermez
-       → bu sayfa görünmez bir iframe içine gömülerek clickjacking yapılabilir. -->
-  <button id="delete-account-btn">Hesabı Sil</button>
+  <div class="warning-banner">⚠️ KASITLI OLARAK GÜVENSİZ — yalnızca test/eğitim amaçlı</div>
+  <header class="topbar">
+    <a class="brand" href="/">🛡️ OWASP API Security — Client-side Demolar</a>
+    <span class="badge">⚠️ VULNERABLE</span>
+  </header>
+  <nav class="tabs">
+    <a href="/">Ana Sayfa</a>
+    <a href="/profile.html#name=Test">DOM XSS</a>
+    <a href="/redirect.html?to=https://example.com">Open Redirect</a>
+    <a href="/frame-target.html" class="active">Clickjacking</a>
+    <a href="/postmessage.html">postMessage</a>
+    <a href="/storage.html">localStorage</a>
+    <a href="/tabnabbing.html">Tabnabbing</a>
+  </nav>
+  <main>
+    <div class="card">
+      <h1>Hassas İşlem — Clickjacking Hedefi</h1>
+      <p class="desc">
+        <strong>CWE-1021.</strong> Bu sunucu hiçbir <code>X-Frame-Options</code> veya
+        CSP <code>frame-ancestors</code> header'ı göndermiyor — bu yüzden bu sayfa
+        herhangi bir sitenin görünmez bir iframe'i içine gömülüp, kullanıcı farkında
+        olmadan "Hesabı Sil" butonuna tıklatılabilir (klasik clickjacking).
+      </p>
+      <button id="delete-account-btn">Hesabı Sil</button>
+    </div>
+  </main>
 </body>
 </html>

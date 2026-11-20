@@ -1,9 +1,39 @@
 <!doctype html>
 <html lang="tr">
-<head><meta charset="utf-8"><title>Panel</title></head>
+<head>
+  <meta charset="utf-8">
+  <title>Panel</title>
+  <link rel="stylesheet" href="/style.css">
+</head>
 <body>
-  <div id="admin-panel" style="display:none">GİZLİ ADMIN PANELİ</div>
-  <div id="status">yükleniyor...</div>
+  <header class="topbar">
+    <a class="brand" href="/">🛡️ OWASP API Security — Client-side Demolar</a>
+    <span class="badge">✅ SECURE</span>
+  </header>
+  <nav class="tabs">
+    <a href="/">Ana Sayfa</a>
+    <a href="/profile.html#name=Test">DOM XSS</a>
+    <a href="/redirect.html?to=/">Open Redirect</a>
+    <a href="/frame-target.html">Clickjacking</a>
+    <a href="/postmessage.html">postMessage</a>
+    <a href="/storage.html" class="active">localStorage</a>
+    <a href="/tabnabbing.html">Tabnabbing</a>
+  </nav>
+  <main>
+    <div class="card">
+      <h1>Panel — localStorage'a Güvenerek Yetki</h1>
+      <p class="desc">
+        <strong>CWE-602.</strong> Deneyin: DevTools Console'u açıp
+        <code>localStorage.setItem('role','admin')</code> yazıp sayfayı yenileyin.
+        Admin paneli yine de görünmeyecek, çünkü bu sürüm yetkiyi localStorage'a değil,
+        sunucudan (<code>/api/users/me</code>) dönen gerçek JWT doğrulamasına göre
+        veriyor — sahte bir <code>role</code> değeri geçerli bir token olmadan hiçbir
+        işe yaramaz.
+      </p>
+      <div id="admin-panel" class="result-box" style="display:none">🔓 GİZLİ ADMIN PANELİ</div>
+      <div id="status" class="result-box">yükleniyor...</div>
+    </div>
+  </main>
   <script>
     // CWE-602/565 Client-Side Enforcement of Server-Side Security.
     // GÜVENLİ: yetki localStorage'daki bir bayraktan değil, sunucudan

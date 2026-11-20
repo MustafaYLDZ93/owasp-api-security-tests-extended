@@ -1,15 +1,57 @@
 <!doctype html>
 <html lang="tr">
-<head><meta charset="utf-8"><title>Güvenli Demo Sayfaları</title></head>
+<head>
+  <meta charset="utf-8">
+  <title>Güvenli Demo Sayfaları</title>
+  <link rel="stylesheet" href="/style.css">
+</head>
 <body>
-  <h1>OWASP API Security — Client-side Demo Sayfaları (Güvenli)</h1>
-  <ul>
-    <li><a href="/profile.html#name=Test">profile.html</a> — DOM XSS</li>
-    <li><a href="/redirect.html?to=/">redirect.html</a> — Open Redirect</li>
-    <li><a href="/frame-target.html">frame-target.html</a> — Clickjacking</li>
-    <li><a href="/postmessage.html">postmessage.html</a> — postMessage</li>
-    <li><a href="/storage.html">storage.html</a> — localStorage</li>
-    <li><a href="/tabnabbing.html">tabnabbing.html</a> — Reverse Tabnabbing</li>
-  </ul>
+  <header class="topbar">
+    <a class="brand" href="/">🛡️ OWASP API Security — Client-side Demolar</a>
+    <span class="badge">✅ SECURE</span>
+  </header>
+  <main>
+    <p class="intro">
+      Bu sayfalar, API sunucusunun (<code>server.js</code>) güvenli sürümü tarafından
+      servis ediliyor. Her kart bir istemci-tarafı zafiyet ailesini (WSTG-CLNT)
+      temsil ediyor — kartlara tıklayıp DevTools ile kurcalayarak savunmanın
+      gerçekten çalıştığını kendiniz gözlemleyebilirsiniz.
+      Açıklı (kasıtlı güvensiz) sürümü görmek için sunucuyu
+      <code>npm run start:api:vulnerable</code> ile başlatıp
+      <code>http://localhost:3001</code> adresini açın.
+    </p>
+    <div class="catalog">
+      <a class="tile" href="/profile.html#name=Test">
+        <span class="cwe">CWE-79</span>
+        <span class="title">DOM Tabanlı XSS</span>
+        <span class="hint">profile.html — URL fragment'i DOM'a yazılır</span>
+      </a>
+      <a class="tile" href="/redirect.html?to=/">
+        <span class="cwe">CWE-601</span>
+        <span class="title">Open Redirect</span>
+        <span class="hint">redirect.html — istemci tarafı yönlendirme kararı</span>
+      </a>
+      <a class="tile" href="/frame-target.html">
+        <span class="cwe">CWE-1021</span>
+        <span class="title">Clickjacking</span>
+        <span class="hint">frame-target.html — X-Frame-Options testi</span>
+      </a>
+      <a class="tile" href="/postmessage.html">
+        <span class="cwe">CWE-346</span>
+        <span class="title">postMessage Origin Doğrulaması</span>
+        <span class="hint">postmessage.html — çapraz-origin mesajlaşma</span>
+      </a>
+      <a class="tile" href="/storage.html">
+        <span class="cwe">CWE-602</span>
+        <span class="title">localStorage'a Güvenerek Yetki</span>
+        <span class="hint">storage.html — istemci-taraflı rol kontrolü</span>
+      </a>
+      <a class="tile" href="/tabnabbing.html">
+        <span class="cwe">CWE-1022</span>
+        <span class="title">Reverse Tabnabbing</span>
+        <span class="hint">tabnabbing.html — target="_blank" + window.opener</span>
+      </a>
+    </div>
+  </main>
 </body>
 </html>

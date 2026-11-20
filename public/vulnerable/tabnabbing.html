@@ -1,9 +1,39 @@
 <!doctype html>
 <html lang="tr">
-<head><meta charset="utf-8"><title>Dış Bağlantı</title></head>
+<head>
+  <meta charset="utf-8">
+  <title>Dış Bağlantı</title>
+  <link rel="stylesheet" href="/style.css">
+</head>
 <body>
-  <!-- VULNERABILITY: rel="noopener" eksik — açılan sekme window.opener
-       üzerinden bu sayfayı (örn. location.href ile phishing'e) yönlendirebilir. -->
-  <a id="ext-link" href="https://example.com" target="_blank">Dış bağlantı</a>
+  <div class="warning-banner">⚠️ KASITLI OLARAK GÜVENSİZ — yalnızca test/eğitim amaçlı</div>
+  <header class="topbar">
+    <a class="brand" href="/">🛡️ OWASP API Security — Client-side Demolar</a>
+    <span class="badge">⚠️ VULNERABLE</span>
+  </header>
+  <nav class="tabs">
+    <a href="/">Ana Sayfa</a>
+    <a href="/profile.html#name=Test">DOM XSS</a>
+    <a href="/redirect.html?to=https://example.com">Open Redirect</a>
+    <a href="/frame-target.html">Clickjacking</a>
+    <a href="/postmessage.html">postMessage</a>
+    <a href="/storage.html">localStorage</a>
+    <a href="/tabnabbing.html" class="active">Tabnabbing</a>
+  </nav>
+  <main>
+    <div class="card">
+      <h1>Dış Bağlantı — Reverse Tabnabbing</h1>
+      <p class="desc">
+        <strong>CWE-1022.</strong> Aşağıdaki bağlantı <code>rel="noopener"</code>
+        OLMADAN yeni bir sekmede açılıyor. Deneyin: tıklayıp açılan sekmede DevTools
+        Console'dan <code>window.opener</code> yazın — gerçek bir pencere referansı
+        döner. Kötü niyetli bir hedef sayfa bu referansla
+        <code>window.opener.location = 'https://sahte-giris.example'</code> çalıştırıp
+        bu sekmeyi (siz farkında olmadan arka planda) sahte bir giriş sayfasına
+        yönlendirebilirdi.
+      </p>
+      <a id="ext-link" href="https://example.com" target="_blank">Dış bağlantı →</a>
+    </div>
+  </main>
 </body>
 </html>

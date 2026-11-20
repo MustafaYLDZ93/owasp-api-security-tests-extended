@@ -1,8 +1,38 @@
 <!doctype html>
 <html lang="tr">
-<head><meta charset="utf-8"><title>Bildirim</title></head>
+<head>
+  <meta charset="utf-8">
+  <title>Bildirim</title>
+  <link rel="stylesheet" href="/style.css">
+</head>
 <body>
-  <div id="notice">bekleniyor</div>
+  <div class="warning-banner">⚠️ KASITLI OLARAK GÜVENSİZ — yalnızca test/eğitim amaçlı</div>
+  <header class="topbar">
+    <a class="brand" href="/">🛡️ OWASP API Security — Client-side Demolar</a>
+    <span class="badge">⚠️ VULNERABLE</span>
+  </header>
+  <nav class="tabs">
+    <a href="/">Ana Sayfa</a>
+    <a href="/profile.html#name=Test">DOM XSS</a>
+    <a href="/redirect.html?to=https://example.com">Open Redirect</a>
+    <a href="/frame-target.html">Clickjacking</a>
+    <a href="/postmessage.html" class="active">postMessage</a>
+    <a href="/storage.html">localStorage</a>
+    <a href="/tabnabbing.html">Tabnabbing</a>
+  </nav>
+  <main>
+    <div class="card">
+      <h1>Bildirim — postMessage Origin Doğrulaması</h1>
+      <p class="desc">
+        <strong>CWE-346.</strong> Bu sayfa, gönderenin origin'ini hiç kontrol etmeden
+        gelen HER mesajı işliyor. Deneyin: DevTools Console'u açıp
+        <code>window.postMessage('HACKED', '*')</code> yazın — sekme başlığının
+        anında değiştiğini göreceksiniz. Gerçek bir saldırıda bu mesaj, görünmez bir
+        iframe/popup üzerinden FARKLI bir origin'den de gönderilebilirdi.
+      </p>
+      <div id="notice" class="result-box">bekleniyor</div>
+    </div>
+  </main>
   <script>
     // VULNERABILITY: gönderenin origin'i hiç kontrol edilmiyor — herhangi bir
     // sayfa (iframe/popup) bu pencereye mesaj enjekte edebilir (CWE-346).

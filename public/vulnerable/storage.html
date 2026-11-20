@@ -1,9 +1,38 @@
 <!doctype html>
 <html lang="tr">
-<head><meta charset="utf-8"><title>Panel</title></head>
+<head>
+  <meta charset="utf-8">
+  <title>Panel</title>
+  <link rel="stylesheet" href="/style.css">
+</head>
 <body>
-  <div id="admin-panel" style="display:none">GİZLİ ADMIN PANELİ</div>
-  <div id="status">yükleniyor...</div>
+  <div class="warning-banner">⚠️ KASITLI OLARAK GÜVENSİZ — yalnızca test/eğitim amaçlı</div>
+  <header class="topbar">
+    <a class="brand" href="/">🛡️ OWASP API Security — Client-side Demolar</a>
+    <span class="badge">⚠️ VULNERABLE</span>
+  </header>
+  <nav class="tabs">
+    <a href="/">Ana Sayfa</a>
+    <a href="/profile.html#name=Test">DOM XSS</a>
+    <a href="/redirect.html?to=https://example.com">Open Redirect</a>
+    <a href="/frame-target.html">Clickjacking</a>
+    <a href="/postmessage.html">postMessage</a>
+    <a href="/storage.html" class="active">localStorage</a>
+    <a href="/tabnabbing.html">Tabnabbing</a>
+  </nav>
+  <main>
+    <div class="card">
+      <h1>Panel — localStorage'a Güvenerek Yetki</h1>
+      <p class="desc">
+        <strong>CWE-602.</strong> Deneyin: DevTools Console'u açıp
+        <code>localStorage.setItem('role','admin')</code> yazıp sayfayı yenileyin —
+        hiçbir token/giriş gerekmeden "admin paneli" anında görünür hale gelecek, çünkü
+        bu sürüm yetki kararını tamamen bu localStorage bayrağına dayandırıyor.
+      </p>
+      <div id="admin-panel" class="result-box" style="display:none">🔓 GİZLİ ADMIN PANELİ</div>
+      <div id="status" class="result-box">yükleniyor...</div>
+    </div>
+  </main>
   <script>
     // VULNERABILITY: yetki kararı tamamen istemci tarafında, localStorage'daki
     // bir bayrağa göre veriliyor — DevTools Console'dan localStorage.setItem

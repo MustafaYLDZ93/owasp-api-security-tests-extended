@@ -1,9 +1,39 @@
 <!doctype html>
 <html lang="tr">
-<head><meta charset="utf-8"><title>Profil</title></head>
+<head>
+  <meta charset="utf-8">
+  <title>Profil</title>
+  <link rel="stylesheet" href="/style.css">
+</head>
 <body>
-  <h1>Profil</h1>
-  <div id="greeting"></div>
+  <div class="warning-banner">⚠️ KASITLI OLARAK GÜVENSİZ — yalnızca test/eğitim amaçlı</div>
+  <header class="topbar">
+    <a class="brand" href="/">🛡️ OWASP API Security — Client-side Demolar</a>
+    <span class="badge">⚠️ VULNERABLE</span>
+  </header>
+  <nav class="tabs">
+    <a href="/">Ana Sayfa</a>
+    <a href="/profile.html#name=Test" class="active">DOM XSS</a>
+    <a href="/redirect.html?to=https://example.com">Open Redirect</a>
+    <a href="/frame-target.html">Clickjacking</a>
+    <a href="/postmessage.html">postMessage</a>
+    <a href="/storage.html">localStorage</a>
+    <a href="/tabnabbing.html">Tabnabbing</a>
+  </nav>
+  <main>
+    <div class="card">
+      <h1>Profil — DOM Tabanlı XSS</h1>
+      <p class="desc">
+        <strong>CWE-79.</strong> Sayfa, URL'nin <code>#</code> sonrasındaki (fragment)
+        <code>name</code> parametresini okuyup <code>innerHTML</code> ile ekrana basıyor.
+        Deneyin: adres çubuğunun sonuna
+        <code>#name=&lt;img src=x onerror="document.title='XSS!'"&gt;</code> ekleyip Enter'a
+        basın — sekme başlığının değiştiğini göreceksiniz, çünkü payload gerçekten
+        çalıştırıldı.
+      </p>
+      <div id="greeting" class="result-box"></div>
+    </div>
+  </main>
   <script>
     // VULNERABILITY: innerHTML ile ham HTML enjeksiyonu (CWE-79, DOM XSS).
     (function () {

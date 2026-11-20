@@ -1,8 +1,37 @@
 <!doctype html>
 <html lang="tr">
-<head><meta charset="utf-8"><title>Yönlendirme</title></head>
+<head>
+  <meta charset="utf-8">
+  <title>Yönlendirme</title>
+  <link rel="stylesheet" href="/style.css">
+</head>
 <body>
-  <p id="status">bekleniyor...</p>
+  <header class="topbar">
+    <a class="brand" href="/">🛡️ OWASP API Security — Client-side Demolar</a>
+    <span class="badge">✅ SECURE</span>
+  </header>
+  <nav class="tabs">
+    <a href="/">Ana Sayfa</a>
+    <a href="/profile.html#name=Test">DOM XSS</a>
+    <a href="/redirect.html?to=/" class="active">Open Redirect</a>
+    <a href="/frame-target.html">Clickjacking</a>
+    <a href="/postmessage.html">postMessage</a>
+    <a href="/storage.html">localStorage</a>
+    <a href="/tabnabbing.html">Tabnabbing</a>
+  </nav>
+  <main>
+    <div class="card">
+      <h1>Yönlendirme — Open Redirect</h1>
+      <p class="desc">
+        <strong>CWE-601.</strong> Sayfa, <code>?to=</code> query parametresindeki adrese
+        yönlendirme yapıyor. Deneyin: adres çubuğunda
+        <code>?to=https://example.com</code> gibi dış bir adres verin. Bu sürüm, hedefin
+        kendi origin'imizle aynı olup olmadığını kontrol eder; farklıysa yönlendirmeyi
+        reddeder (aşağıda "reddedildi" yazar).
+      </p>
+      <p id="status" class="result-box">bekleniyor...</p>
+    </div>
+  </main>
   <script>
     // CWE-601 Client-side Open Redirect.
     // GÜVENLİ: yalnızca aynı origin'e (göreli yol) izin verilir.

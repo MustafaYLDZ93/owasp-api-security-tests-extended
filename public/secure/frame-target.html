@@ -1,9 +1,37 @@
 <!doctype html>
 <html lang="tr">
-<head><meta charset="utf-8"><title>Hassas İşlem</title></head>
+<head>
+  <meta charset="utf-8">
+  <title>Hassas İşlem</title>
+  <link rel="stylesheet" href="/style.css">
+</head>
 <body>
-  <!-- Clickjacking hedefi (CWE-1021). Savunma bu sayfanın JS'inde değil,
-       sunucunun X-Frame-Options: DENY header'ındadır (bkz. server.js). -->
-  <button id="delete-account-btn">Hesabı Sil</button>
+  <header class="topbar">
+    <a class="brand" href="/">🛡️ OWASP API Security — Client-side Demolar</a>
+    <span class="badge">✅ SECURE</span>
+  </header>
+  <nav class="tabs">
+    <a href="/">Ana Sayfa</a>
+    <a href="/profile.html#name=Test">DOM XSS</a>
+    <a href="/redirect.html?to=/">Open Redirect</a>
+    <a href="/frame-target.html" class="active">Clickjacking</a>
+    <a href="/postmessage.html">postMessage</a>
+    <a href="/storage.html">localStorage</a>
+    <a href="/tabnabbing.html">Tabnabbing</a>
+  </nav>
+  <main>
+    <div class="card">
+      <h1>Hassas İşlem — Clickjacking Hedefi</h1>
+      <p class="desc">
+        <strong>CWE-1021.</strong> Bu sayfa, bir saldırganın görünmez bir
+        <code>&lt;iframe&gt;</code> içine gömmeye çalışabileceği "hassas işlem" sayfasını
+        temsil ediyor. Deneyin: kendi test sayfanızda bu adresi bir iframe içine koymayı
+        deneyin — bu sürümde sunucu <code>X-Frame-Options: DENY</code> header'ı gönderdiği
+        için tarayıcı, sayfanın başka bir sitenin iframe'i içinde render edilmesini
+        tamamen reddeder.
+      </p>
+      <button id="delete-account-btn">Hesabı Sil</button>
+    </div>
+  </main>
 </body>
 </html>
